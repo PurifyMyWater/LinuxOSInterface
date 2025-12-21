@@ -4,7 +4,7 @@ set(FETCHCONTENT_QUIET OFF)
 FetchContent_Declare(
         OSInterface
         GIT_REPOSITORY  git@github.com:vacmg/OSInterface.git
-        GIT_TAG         v0.2.0
+        GIT_TAG         v0.3.0
 )
 FetchContent_MakeAvailable(OSInterface)
 
