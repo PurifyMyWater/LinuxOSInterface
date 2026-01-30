@@ -143,6 +143,18 @@ OSInterface_BinarySemaphore* LinuxOSInterface::osCreateBinarySemaphore()
     return new linuxBinarySemaphore();
 }
 
+OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_Timer::Mode mode,
+                                                   OSInterfaceProcess callback, void* callbackArg,
+                                                   const char* timerName)
+{
+    return nullptr;
+}
+
+OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
+{
+    return nullptr;
+}
+
 void* LinuxOSInterface::osMalloc(const uint32_t size)
 {
     return size == 0 ? nullptr : malloc(size);
