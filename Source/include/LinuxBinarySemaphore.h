@@ -5,12 +5,12 @@
 
 #include <semaphore>
 
-class linuxBinarySemaphore final : public OSInterface_BinarySemaphore
+class LinuxBinarySemaphore final : public OSInterface_BinarySemaphore
 {
 public:
-    linuxBinarySemaphore();
+    LinuxBinarySemaphore();
 
-    ~linuxBinarySemaphore() override;
+    ~LinuxBinarySemaphore() override;
 
     void signal() override;
 

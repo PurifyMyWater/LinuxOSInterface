@@ -5,12 +5,12 @@
 
 #include <mutex>
 
-class linuxMutex final : public OSInterface_Mutex
+class LinuxMutex final : public OSInterface_Mutex
 {
 public:
-    linuxMutex();
+    LinuxMutex();
 
-    ~linuxMutex() override;
+    ~LinuxMutex() override;
 
     void signal() override;
 

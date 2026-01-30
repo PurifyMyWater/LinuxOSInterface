@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
-linuxMutex::linuxMutex()
+LinuxMutex::LinuxMutex()
 {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
@@ -13,12 +13,12 @@ linuxMutex::linuxMutex()
     pthread_mutex_init(&mutex, &attr);
 }
 
-linuxMutex::~linuxMutex()
+LinuxMutex::~LinuxMutex()
 {
     pthread_mutex_destroy(&mutex);
 }
 
-void linuxMutex::signal()
+void LinuxMutex::signal()
 {
     if (const error_t res = pthread_mutex_unlock(&mutex); res != 0)
     {
@@ -27,7 +27,7 @@ void linuxMutex::signal()
     }
 }
 
-bool linuxMutex::wait(uint32_t max_time_to_wait_ms)
+bool LinuxMutex::wait(uint32_t max_time_to_wait_ms)
 {
     const timespec ts  = msToTimespec(max_time_to_wait_ms);
     error_t        res = pthread_mutex_timedlock(&mutex, &ts);

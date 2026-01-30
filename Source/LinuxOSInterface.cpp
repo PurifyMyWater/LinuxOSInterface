@@ -32,12 +32,12 @@ void LinuxOSInterface::osSleep(const uint32_t ms)
 
 OSInterface_Mutex* LinuxOSInterface::osCreateMutex()
 {
-    return new linuxMutex();
+    return new LinuxMutex();
 }
 
 OSInterface_BinarySemaphore* LinuxOSInterface::osCreateBinarySemaphore()
 {
-    return new linuxBinarySemaphore();
+    return new LinuxBinarySemaphore();
 }
 
 OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_Timer::Mode mode,

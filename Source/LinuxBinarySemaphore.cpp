@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
-linuxBinarySemaphore::linuxBinarySemaphore()
+LinuxBinarySemaphore::LinuxBinarySemaphore()
 {
     if (sem_init(&semaphore, 0, 0) == -1)
     {
@@ -14,7 +14,7 @@ linuxBinarySemaphore::linuxBinarySemaphore()
     }
 }
 
-linuxBinarySemaphore::~linuxBinarySemaphore()
+LinuxBinarySemaphore::~LinuxBinarySemaphore()
 {
     if (sem_destroy(&semaphore) == -1)
     {
@@ -23,7 +23,7 @@ linuxBinarySemaphore::~linuxBinarySemaphore()
     }
 }
 
-void linuxBinarySemaphore::signal()
+void LinuxBinarySemaphore::signal()
 {
     if (sem_post(&semaphore) == -1)
     {
@@ -32,7 +32,7 @@ void linuxBinarySemaphore::signal()
     }
 }
 
-bool linuxBinarySemaphore::wait(uint32_t max_time_to_wait_ms)
+bool LinuxBinarySemaphore::wait(uint32_t max_time_to_wait_ms)
 {
     const timespec ts  = msToTimespec(max_time_to_wait_ms);
     error_t        res = sem_timedwait(&semaphore, &ts);
