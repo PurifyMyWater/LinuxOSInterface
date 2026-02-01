@@ -2,6 +2,7 @@
 #include "OSInterface_Log.h"
 #include "Utils.h"
 
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 

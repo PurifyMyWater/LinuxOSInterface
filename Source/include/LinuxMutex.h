@@ -3,7 +3,7 @@
 
 #include "OSInterface_Mutex.h"
 
-#include <mutex>
+#include <pthread.h>
 
 class LinuxMutex final : public OSInterface_Mutex
 {

@@ -3,7 +3,7 @@
 
 #include "OSInterface_BinarySemaphore.h"
 
-#include <semaphore>
+#include <semaphore.h>
 
 class LinuxBinarySemaphore final : public OSInterface_BinarySemaphore
 {
