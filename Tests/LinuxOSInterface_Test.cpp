@@ -93,7 +93,5 @@ TEST(LinuxOSInterface, osCreateMutexNotNull)
 
 TEST(LinuxOSInterface, osCreateBinarySemaphoreNotNull)
 {
-    OSInterface_BinarySemaphore* semaphore = linuxOSInterface.osCreateBinarySemaphore();
-    EXPECT_NE(semaphore, nullptr);
-    delete semaphore;
+    EXPECT_NE(linuxOSInterface.osCreateBinarySemaphore(), nullptr);
 }
