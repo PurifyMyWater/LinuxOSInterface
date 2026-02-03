@@ -1,113 +1,10 @@
 #include "LinuxOSInterface.h"
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <mutex>
-#include <semaphore>
+#include "LinuxBinarySemaphore.h"
+#include "LinuxMutex.h"
+
 #include <thread>
 
 #define CONFIG_USE_BUSY_SLEEP 0
-
-timespec msToTimespec(uint32_t ms)
-{
-    timespec ts{};
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += ms / 1000;
-    ts.tv_nsec += (ms % 1000) * 1000000;
-
-    // Handle overflow of nanoseconds
-    if (ts.tv_nsec >= 1000000000)
-    {
-        ts.tv_sec += 1;
-        ts.tv_nsec -= 1000000000;
-    }
-    return ts;
-}
-
-class linuxMutex final : public OSInterface_Mutex
-{
-public:
-    linuxMutex()
-    {
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
-        pthread_mutex_init(&mutex, &attr);
-    }
-
-    ~linuxMutex() override
-    {
-        pthread_mutex_destroy(&mutex);
-    }
-
-    void signal() override
-    {
-        if (const error_t res = pthread_mutex_unlock(&mutex); res != 0)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to unlock mutex: %s", strerror(res));
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    bool wait(uint32_t max_time_to_wait_ms) override
-    {
-        const timespec ts  = msToTimespec(max_time_to_wait_ms);
-        error_t        res = pthread_mutex_timedlock(&mutex, &ts);
-        if (res != 0)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to lock mutex: %s", strerror(res));
-        }
-        return res == 0;
-    }
-
-private:
-    pthread_mutex_t mutex{};
-};
-
-class linuxBinarySemaphore final : public OSInterface_BinarySemaphore
-{
-public:
-    linuxBinarySemaphore()
-    {
-        if (sem_init(&semaphore, 0, 0) == -1)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to initialize semaphore: %s", strerror(errno));
-            exit(errno);
-        }
-    }
-
-    ~linuxBinarySemaphore() override
-    {
-        if (sem_destroy(&semaphore) == -1)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to destroy semaphore: %s", strerror(errno));
-            exit(errno);
-        }
-    }
-
-    void signal() override
-    {
-        if (sem_post(&semaphore) == -1)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to signal semaphore: %s", strerror(errno));
-            exit(errno);
-        }
-    }
-
-    bool wait(uint32_t max_time_to_wait_ms) override
-    {
-        const timespec ts  = msToTimespec(max_time_to_wait_ms);
-        error_t        res = sem_timedwait(&semaphore, &ts);
-        if (res == -1)
-        {
-            OSInterfaceLogError("LinuxOSInterface", "Failed to wait on semaphore: %s", strerror(errno));
-        }
-        return res == 0;
-    }
-
-private:
-    sem_t semaphore{};
-};
 
 uint32_t LinuxOSInterface::osMillis()
 {
@@ -135,12 +32,24 @@ void LinuxOSInterface::osSleep(const uint32_t ms)
 
 OSInterface_Mutex* LinuxOSInterface::osCreateMutex()
 {
-    return new linuxMutex();
+    return new LinuxMutex();
 }
 
 OSInterface_BinarySemaphore* LinuxOSInterface::osCreateBinarySemaphore()
 {
-    return new linuxBinarySemaphore();
+    return new LinuxBinarySemaphore();
+}
+
+OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_Timer::Mode mode,
+                                                   OSInterfaceProcess callback, void* callbackArg,
+                                                   const char* timerName)
+{
+    return nullptr;
+}
+
+OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
+{
+    return nullptr;
 }
 
 void* LinuxOSInterface::osMalloc(const uint32_t size)
