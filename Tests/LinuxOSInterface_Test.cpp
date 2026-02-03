@@ -86,10 +86,14 @@ TEST(LinuxOSInterface, runProcessTest)
 
 TEST(LinuxOSInterface, osCreateMutexNotNull)
 {
-    EXPECT_NE(linuxOSInterface.osCreateMutex(), nullptr);
+    OSInterface_Mutex* mutex = linuxOSInterface.osCreateMutex();
+    EXPECT_NE(mutex, nullptr);
+    delete mutex;
 }
 
 TEST(LinuxOSInterface, osCreateBinarySemaphoreNotNull)
 {
-    EXPECT_NE(linuxOSInterface.osCreateBinarySemaphore(), nullptr);
+    OSInterface_BinarySemaphore* semaphore = linuxOSInterface.osCreateBinarySemaphore();
+    EXPECT_NE(semaphore, nullptr);
+    delete semaphore;
 }
