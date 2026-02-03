@@ -222,7 +222,7 @@ jobs:
             - Valgrind
         if: always()
         steps:
-            -   name: Check dependences result
+            -   name: Check dependencies result
                 if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
                 run: |
                     echo "One or more required jobs failed."
