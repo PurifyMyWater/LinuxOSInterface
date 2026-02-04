@@ -1,7 +1,4 @@
 if (NOT ESP_PLATFORM) # Only configure tests if we are building in a computer.
-
-    enable_testing()
-
     project(LinuxOSInterface_GoogleTests)
 
     include(FetchContent)
@@ -13,8 +10,6 @@ if (NOT ESP_PLATFORM) # Only configure tests if we are building in a computer.
             GIT_TAG         v1.17.0
     )
     FetchContent_MakeAvailable(googletest)
-
-    include(GoogleTest)
 
     include_directories("${gtest_SOURCE_DIR}/include" ".")
 
@@ -28,6 +23,4 @@ if (NOT ESP_PLATFORM) # Only configure tests if we are building in a computer.
     target_link_libraries(LinuxOSInterface_GoogleTestsExe LinuxOSInterface)
 
     target_link_libraries(LinuxOSInterface_GoogleTestsExe gtest gtest_main)
-
-    gtest_discover_tests(LinuxOSInterface_GoogleTestsExe)
 endif ()
