@@ -4,8 +4,8 @@
 #include "OSInterface.h"
 #include "OSInterface_Timer.h"
 
-#include <signal.h>
-#include <time.h>
+#include <csignal>
+#include <ctime>
 
 #define CLOCKID CLOCK_REALTIME
 
