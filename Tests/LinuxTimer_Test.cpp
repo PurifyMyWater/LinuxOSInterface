@@ -2,6 +2,8 @@
 #include "LinuxOSInterface.h"
 #include "OSInterface_Timer.h"
 #include "gtest/gtest.h"
+#include <cstdint>
+#include <cmath>
 
 static LinuxOSInterface linuxOSInterface;
 
