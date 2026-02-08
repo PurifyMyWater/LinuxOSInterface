@@ -7,10 +7,10 @@
 void LinuxTimer::callbackWrapper(union sigval sv)
 {
     if (LinuxTimer* timer = static_cast<LinuxTimer*>(sv.sival_ptr);
-        timer != nullptr && timer->callbacFunction != nullptr)
+        timer != nullptr && timer->callbackFunction != nullptr)
     {
         OSInterfaceLogInfo("LinuxOSInterface", "timer callback invoked");
-        timer->callbacFunction(timer->callbackArg);
+        timer->callbackFunction(timer->callbackArg);
     }
     else
     {
@@ -25,8 +25,8 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 {
     this->name = strdup(timerName);
 
-    this->callbacFunction = callback;
-    this->callbackArg     = callbackArg;
+    this->callbackFunction = callback;
+    this->callbackArg      = callbackArg;
 
     this->timerSpec.it_value.tv_sec  = period / 1000;
     this->timerSpec.it_value.tv_nsec = (period % 1000) * 1000000;

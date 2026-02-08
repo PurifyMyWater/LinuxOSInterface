@@ -44,7 +44,7 @@ private:
 
     timer_t timerId{};
 
-    OSInterfaceProcess callbacFunction{};
+    OSInterfaceProcess callbackFunction{};
     void*              callbackArg{};
 
     sigevent sev{};
