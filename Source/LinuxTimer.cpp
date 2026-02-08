@@ -26,7 +26,7 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
     this->name = strdup(timerName);
 
     this->callbacFunction = callback;
-    this->callbackArg    = callbackArg;
+    this->callbackArg     = callbackArg;
 
     this->timerSpec.it_value.tv_sec  = period / 1000;
     this->timerSpec.it_value.tv_nsec = (period % 1000) * 1000000;
