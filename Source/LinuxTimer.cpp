@@ -15,7 +15,7 @@ void LinuxTimer::callbackWrapper(union sigval sv)
     else
     {
         OSInterfaceLogWarning("LinuxOSInterface", "Timer callback invoked but %s%s",
-                              timer == nullptr ? "EspTimer instance is null" : "callback function is null for timer ",
+                              timer == nullptr ? "LinuxTimer instance is null" : "callback function is null for timer ",
                               timer == nullptr ? "" : timer->name);
     }
 }
