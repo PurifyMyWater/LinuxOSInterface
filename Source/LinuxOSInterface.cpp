@@ -1,6 +1,7 @@
 #include "LinuxOSInterface.h"
 #include "LinuxBinarySemaphore.h"
 #include "LinuxMutex.h"
+#include "LinuxTimer.h"
 
 #include <thread>
 
@@ -44,7 +45,7 @@ OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_
                                                    OSInterfaceProcess callback, void* callbackArg,
                                                    const char* timerName)
 {
-    return nullptr;
+    return new LinuxTimer(period, mode, callback, callbackArg, timerName);
 }
 
 OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
