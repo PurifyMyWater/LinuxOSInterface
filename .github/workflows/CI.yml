@@ -15,9 +15,14 @@ on:
         branches-ignore:
             - '*Test*'
 
+permissions:
+    contents: read
+
 jobs:
     Build:
         runs-on: ubuntu-latest
+        permissions:
+            actions: write
         env:
             GH_PAT: ${{ secrets.PMW_CI_PAT }}
             GH_USER_NAME: vacmg
@@ -56,6 +61,8 @@ jobs:
 
     Test-Coverage:
         runs-on: ubuntu-latest
+        permissions:
+            actions: write
         needs: Build
 
         defaults:
@@ -89,6 +96,8 @@ jobs:
 
     Valgrind:
         runs-on: ubuntu-latest
+        permissions:
+            actions: write
         needs: Build
 
         steps:
@@ -216,6 +225,7 @@ jobs:
 
     success:
         runs-on: ubuntu-latest
+        permissions: {}
         needs:
             - Test-Coverage
             - Linter
