@@ -110,8 +110,8 @@ bool LinuxUntypedQueue::receive(void* message, uint32_t maxTimeToWait_ms)
 
 bool LinuxUntypedQueue::receiveFromISR(void* message)
 {
-    timespec      ts{0, 0};
-    const ssize_t result = mq_timedreceive(mqd_, static_cast<char*>(message), messageSize_, nullptr, &ts);
+    const timespec ts     = msToTimespec(0);
+    const ssize_t  result = mq_timedreceive(mqd_, static_cast<char*>(message), messageSize_, nullptr, &ts);
 
     if (result == -1)
     {
