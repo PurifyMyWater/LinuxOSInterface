@@ -71,7 +71,7 @@ bool LinuxUntypedQueue::isEmpty()
 
 bool LinuxUntypedQueue::isFull()
 {
-    return length() >= maxMessages_;
+    return this->length() >= maxMessages_;
 }
 
 void LinuxUntypedQueue::reset()
