@@ -4,7 +4,6 @@
 #include "OSInterface_UntypedQueue.h"
 
 #include <mqueue.h>
-#include <string>
 
 class LinuxUntypedQueue final : public OSInterface_UntypedQueue
 {
@@ -38,11 +37,13 @@ public:
     bool sendToFrontFromISR(const void* message) override;
 
 private:
-    mqd_t       mqd_{(mqd_t)-1};
-    std::string queueName_;
-    uint32_t    maxMessages_;
-    uint32_t    messageSize_;
+    mqd_t    mqd;
+    char     queueName[256];
+    uint32_t maxMessages;
+    uint32_t messageSize;
+    bool     isOpen{false};
 
+    void            createQueue();
     static uint32_t osMillis();
 };
 #endif // LINUXUNTYPEDQUEUE_H
