@@ -53,7 +53,8 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 
     if (timer_create(CLOCKID, &this->sev, &this->timerId) == -1)
     {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize semaphore: %s", strerror(errno));
+        OSInterfaceLogError("LinuxOSInterface", "Failed to create timer '%s': %s",
+                            timerName ? timerName : "unknown", strerror(errno));
         exit(errno);
     }
 }
