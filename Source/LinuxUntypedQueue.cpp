@@ -60,7 +60,7 @@ uint32_t LinuxUntypedQueue::size()
 
 uint32_t LinuxUntypedQueue::available()
 {
-    const uint32_t currentLength = length();
+    const uint32_t currentLength = this->length();
     return maxMessages_ - currentLength;
 }
 
