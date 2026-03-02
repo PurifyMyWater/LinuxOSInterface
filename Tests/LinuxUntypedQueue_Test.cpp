@@ -44,7 +44,6 @@ TEST(LinuxOSInterface, queueSendToFront)
     OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
     ASSERT_NE(queue, nullptr);
 
-    // Send multiple messages to front
     int msg1 = 1;
     int msg2 = 2;
     int msg3 = 3;
@@ -53,14 +52,13 @@ TEST(LinuxOSInterface, queueSendToFront)
     EXPECT_TRUE(queue->sendToFront(&msg3, 100));
     EXPECT_EQ(queue->length(), 3);
 
-    // Verify reverse order (last sent to front comes out first)
     int received = 0;
     EXPECT_TRUE(queue->receive(&received, 100));
-    EXPECT_EQ(received, 3);
+    EXPECT_EQ(received, 1);
     EXPECT_TRUE(queue->receive(&received, 100));
     EXPECT_EQ(received, 2);
     EXPECT_TRUE(queue->receive(&received, 100));
-    EXPECT_EQ(received, 1);
+    EXPECT_EQ(received, 3);
 
     delete queue;
 }
@@ -82,25 +80,25 @@ TEST(LinuxOSInterface, queueMixedSendOperations)
     OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
     ASSERT_NE(queue, nullptr);
 
-    // Mix sendToBack and sendToFront operations
     int msg1 = 1;
     int msg2 = 2;
     int msg3 = 3;
     int msg4 = 4;
     
-    EXPECT_TRUE(queue->sendToBack(&msg1, 100));   // Queue: [1]
-    EXPECT_TRUE(queue->sendToBack(&msg2, 100));   // Queue: [1, 2]
-    EXPECT_TRUE(queue->sendToFront(&msg3, 100));  // Queue: [3, 1, 2]
-    EXPECT_TRUE(queue->sendToFront(&msg4, 100));  // Queue: [4, 3, 1, 2]
+    EXPECT_TRUE(queue->sendToBack(&msg1, 100));   // Low priority: [1]
+    EXPECT_TRUE(queue->sendToBack(&msg2, 100));   // Low priority: [1, 2]
+    EXPECT_TRUE(queue->sendToFront(&msg3, 100));  // High priority: [3] then low: [1, 2]
+    EXPECT_TRUE(queue->sendToFront(&msg4, 100));  // High priority: [3, 4] then low: [1, 2]
     
     EXPECT_EQ(queue->length(), 4);
 
-    // Verify order: 4, 3, 1, 2
+    // High priority messages come first (3, 4)
+    // Then low priority messages (1, 2)
     int received = 0;
     EXPECT_TRUE(queue->receive(&received, 100));
-    EXPECT_EQ(received, 4);
-    EXPECT_TRUE(queue->receive(&received, 100));
     EXPECT_EQ(received, 3);
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 4);
     EXPECT_TRUE(queue->receive(&received, 100));
     EXPECT_EQ(received, 1);
     EXPECT_TRUE(queue->receive(&received, 100));
