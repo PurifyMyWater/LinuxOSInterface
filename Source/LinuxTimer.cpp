@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <cstring>
 
+#define CLOCKID CLOCK_REALTIME
+
 void LinuxTimer::callbackWrapper(union sigval sv)
 {
     if (LinuxTimer* timer = static_cast<LinuxTimer*>(sv.sival_ptr);

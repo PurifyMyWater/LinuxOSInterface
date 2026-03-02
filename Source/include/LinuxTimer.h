@@ -7,8 +7,6 @@
 #include <csignal>
 #include <ctime>
 
-#define CLOCKID CLOCK_REALTIME
-
 class LinuxTimer final : public OSInterface_Timer
 {
 public:
