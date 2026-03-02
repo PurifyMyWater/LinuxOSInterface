@@ -16,11 +16,13 @@ LinuxUntypedQueue::LinuxUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
     snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d", getpid(), osMillis());
     queueName_ = queueName;
 
-    mq_attr attr{};
-    attr.mq_flags   = 0;
-    attr.mq_maxmsg  = maxMessages;
-    attr.mq_msgsize = messageSize;
-    attr.mq_curmsgs = 0;
+    mq_attr attr{
+      .mq_flags = 0,
+      .mq_maxmsg  = maxMessages,
+      .mq_msgsize = messageSize,
+      .mq_curmsgs = 0
+    };
+    
 
     mqd_ = mq_open(queueName_.c_str(), O_CREAT | O_RDWR | O_EXCL, 0644, &attr);
     if (mqd_ == -1)
