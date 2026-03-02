@@ -66,7 +66,7 @@ uint32_t LinuxUntypedQueue::available()
 
 bool LinuxUntypedQueue::isEmpty()
 {
-    return length() == 0;
+    return this->length() == 0;
 }
 
 bool LinuxUntypedQueue::isFull()
