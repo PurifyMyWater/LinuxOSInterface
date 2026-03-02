@@ -4,28 +4,35 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <mutex>
 
 #define CLOCKID CLOCK_REALTIME
+#define TIMER_SIG SIGRTMIN
 
-void LinuxTimer::callbackWrapper(union sigval sv)
+void LinuxTimer::initializeSignalSystem()
 {
-    if (LinuxTimer* timer = static_cast<LinuxTimer*>(sv.sival_ptr);
+    struct sigaction sa{};
+    sa.sa_flags     = SA_SIGINFO;
+    sa.sa_sigaction = signalHandler;
+    sigemptyset(&sa.sa_mask);
+    sigaction(TIMER_SIG, &sa, nullptr);
+}
+
+void LinuxTimer::signalHandler(int sig, siginfo_t* si, void* uc)
+{
+    if (LinuxTimer* timer = static_cast<LinuxTimer*>(si->si_value.sival_ptr);
         timer != nullptr && timer->callbackFunction != nullptr)
     {
-        OSInterfaceLogInfo("LinuxOSInterface", "timer callback invoked");
         timer->callbackFunction(timer->callbackArg);
-    }
-    else
-    {
-        OSInterfaceLogWarning("LinuxOSInterface", "Timer callback invoked but %s%s",
-                              timer == nullptr ? "LinuxTimer instance is null" : "callback function is null for timer ",
-                              timer == nullptr ? "" : timer->name);
     }
 }
 
 LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfaceProcess callback, void* callbackArg,
                        const char* timerName)
 {
+    static std::once_flag sigSetupFlag;
+    std::call_once(sigSetupFlag, [this]() { initializeSignalSystem(); });
+
     this->name = strdup(timerName);
 
     this->callbackFunction = callback;
@@ -40,8 +47,8 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
         this->timerSpec.it_interval.tv_nsec = (period % 1000) * 1000000;
     }
 
-    this->sev.sigev_notify          = SIGEV_THREAD;
-    this->sev.sigev_notify_function = callbackWrapper;
+    this->sev.sigev_notify          = SIGEV_SIGNAL;
+    this->sev.sigev_signo           = TIMER_SIG;
     this->sev.sigev_value.sival_ptr = this;
 
     if (timer_create(CLOCKID, &this->sev, &this->timerId) == -1)

@@ -49,7 +49,9 @@ private:
 
     itimerspec timerSpec{};
 
-    static void callbackWrapper(union sigval sv);
+    static void initializeSignalSystem();
+
+    static void signalHandler(int sig, siginfo_t* si, void* uc);
 };
 
 #endif // LINUXTIMER_H
