@@ -1,6 +1,7 @@
 #include "LinuxTimer.h"
 #include "OSInterface_Log.h"
 
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 
@@ -41,7 +42,11 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
     this->sev.sigev_notify_function = callbackWrapper;
     this->sev.sigev_value.sival_ptr = this;
 
-    timer_create(CLOCKID, &this->sev, &this->timerId);
+    if (timer_create(CLOCKID, &this->sev, &this->timerId) == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize semaphore: %s", strerror(errno));
+        exit(errno);
+    }
 }
 
 LinuxTimer::~LinuxTimer()
