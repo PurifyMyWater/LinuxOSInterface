@@ -8,22 +8,17 @@
 #include <cstring>
 #include <unistd.h>
 
-LinuxUntypedQueue::LinuxUntypedQueue(uint32_t maxMessages, uint32_t messageSize) :
+LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t messageSize, bool& result) :
     maxMessages(maxMessages), messageSize(messageSize)
 {
     // Create a unique queue name using process ID and timestamp
     snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d", getpid(), osMillis());
-    createQueue();
+    result = createQueue();
 }
 
 LinuxUntypedQueue::~LinuxUntypedQueue()
 {
-    if (isOpen)
-    {
-        mq_close(mqd);
-        mq_unlink(queueName);
-        isOpen = false;
-    }
+    deleteQueue();
 }
 
 uint32_t LinuxUntypedQueue::length()
@@ -60,16 +55,14 @@ bool LinuxUntypedQueue::isFull()
 
 void LinuxUntypedQueue::reset()
 {
-    if (isOpen)
+
+    if (createQueue() != true)
     {
-        mq_close(mqd);
-        mq_unlink(queueName);
-        isOpen = false;
+        OSInterfaceLogError("LinuxOSInterface", "Failed to reset queue");
     }
-    createQueue();
 }
 
-void LinuxUntypedQueue::createQueue()
+bool LinuxUntypedQueue::createQueue()
 {
     mq_attr attr{};
     attr.mq_flags   = 0;
@@ -81,12 +74,22 @@ void LinuxUntypedQueue::createQueue()
     if (mqd == -1)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to create message queue %s: %s", queueName, strerror(errno));
-        exit(errno);
+        return false;
     }
-    isOpen = true;
+    return true;
 }
 
-bool LinuxUntypedQueue::receive(void* message, uint32_t maxTimeToWait_ms)
+void LinuxUntypedQueue::deleteQueue()
+{
+    if (mqd != -1)
+    {
+        mq_close(mqd);
+        mq_unlink(queueName);
+        mqd = -1;
+    }
+}
+
+bool LinuxUntypedQueue::receive(void* message, const uint32_t maxTimeToWait_ms)
 {
     const timespec ts     = msToTimespec(maxTimeToWait_ms);
     const ssize_t  result = mq_timedreceive(mqd, static_cast<char*>(message), messageSize, nullptr, &ts);
@@ -112,7 +115,7 @@ bool LinuxUntypedQueue::receiveFromISR(void* message)
     return true;
 }
 
-bool LinuxUntypedQueue::sendToBack(const void* message, uint32_t maxTimeToWait_ms)
+bool LinuxUntypedQueue::sendToBack(const void* message, const uint32_t maxTimeToWait_ms)
 {
     const timespec ts     = msToTimespec(maxTimeToWait_ms);
     const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, 0, &ts);
@@ -138,7 +141,7 @@ bool LinuxUntypedQueue::sendToBackFromISR(const void* message)
     return true;
 }
 
-bool LinuxUntypedQueue::sendToFront(const void* message, uint32_t maxTimeToWait_ms)
+bool LinuxUntypedQueue::sendToFront(const void* message, const uint32_t maxTimeToWait_ms)
 {
     const timespec     ts      = msToTimespec(maxTimeToWait_ms);
     constexpr uint32_t maxPrio = 31;

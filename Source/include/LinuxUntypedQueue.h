@@ -8,7 +8,7 @@
 class LinuxUntypedQueue final : public OSInterface_UntypedQueue
 {
 public:
-    LinuxUntypedQueue(uint32_t maxMessages, uint32_t messageSize);
+    LinuxUntypedQueue(uint32_t maxMessages, uint32_t messageSize, bool& result);
 
     ~LinuxUntypedQueue() override;
 
@@ -37,13 +37,13 @@ public:
     bool sendToFrontFromISR(const void* message) override;
 
 private:
-    mqd_t    mqd;
-    char     queueName[256];
+    mqd_t    mqd{};
+    char     queueName[256]{};
     uint32_t maxMessages;
     uint32_t messageSize;
-    bool     isOpen{false};
 
-    void            createQueue();
+    bool            createQueue();
+    void            deleteQueue();
     static uint32_t osMillis();
 };
 #endif // LINUXUNTYPEDQUEUE_H
