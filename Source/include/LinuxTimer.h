@@ -42,8 +42,10 @@ private:
 
     timer_t timerId{};
 
-    OSInterfaceProcess callbackFunction{};
-    void*              callbackArg{};
+    Mode mode;
+
+    OSInterfaceProcess callbackFunction;
+    void*              callbackArg;
 
     sigevent sev{};
 

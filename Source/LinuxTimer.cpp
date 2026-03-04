@@ -35,6 +35,8 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 
     this->name = strdup(timerName);
 
+    this->mode = mode;
+
     this->callbackFunction = callback;
     this->callbackArg      = callbackArg;
 
@@ -43,8 +45,8 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 
     if (mode == PERIODIC)
     {
-        this->timerSpec.it_interval.tv_sec  = period / 1000;
-        this->timerSpec.it_interval.tv_nsec = (period % 1000) * 1000000;
+        this->timerSpec.it_interval.tv_sec  = this->timerSpec.it_value.tv_sec;
+        this->timerSpec.it_interval.tv_nsec = this->timerSpec.it_value.tv_nsec;
     }
 
     this->sev.sigev_notify          = SIGEV_SIGNAL;
@@ -98,10 +100,10 @@ bool LinuxTimer::setPeriod(uint32_t newPeriod_ms)
     timerSpec.it_value.tv_sec  = newPeriod_ms / 1000;
     timerSpec.it_value.tv_nsec = (newPeriod_ms % 1000) * 1000000;
 
-    if (timerSpec.it_interval.tv_sec != 0 || timerSpec.it_interval.tv_nsec != 0)
+    if (mode == PERIODIC)
     {
-        timerSpec.it_interval.tv_sec  = newPeriod_ms / 1000;
-        timerSpec.it_interval.tv_nsec = (newPeriod_ms % 1000) * 1000000;
+        timerSpec.it_interval.tv_sec  = timerSpec.it_value.tv_sec;
+        timerSpec.it_interval.tv_nsec = timerSpec.it_value.tv_nsec;
     }
     return start();
 }
@@ -118,7 +120,7 @@ bool LinuxTimer::setPeriodFromISR(uint32_t newPeriod_ms)
 
 [[nodiscard]] LinuxTimer::Mode LinuxTimer::getMode() const
 {
-    return (timerSpec.it_interval.tv_sec == 0 && timerSpec.it_interval.tv_nsec == 0) ? ONE_SHOT : PERIODIC;
+    return mode;
 }
 
 [[nodiscard]] uint32_t LinuxTimer::getTimeout() const
