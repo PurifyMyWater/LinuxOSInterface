@@ -15,7 +15,11 @@ void LinuxTimer::initializeSignalSystem()
     sa.sa_flags     = SA_SIGINFO;
     sa.sa_sigaction = signalHandler;
     sigemptyset(&sa.sa_mask);
-    sigaction(TIMER_SIG, &sa, nullptr);
+    if (sigaction(TIMER_SIG, &sa, nullptr))
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to setup sigaction: %s", strerror(errno));
+        exit(errno);
+    }
 }
 
 void LinuxTimer::signalHandler(int sig, siginfo_t* si, void* uc)
