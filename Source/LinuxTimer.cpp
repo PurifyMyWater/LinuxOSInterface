@@ -64,7 +64,11 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 LinuxTimer::~LinuxTimer()
 {
     free(name);
-    timer_delete(timerId);
+    if (timer_delete(timerId) == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy timer: %s", strerror(errno));
+        exit(errno);
+    }
 }
 
 bool LinuxTimer::start()
@@ -91,7 +95,11 @@ bool LinuxTimer::stopFromISR()
 [[nodiscard]] bool LinuxTimer::isRunning() const
 {
     itimerspec currentSpec{};
-    timer_gettime(timerId, &currentSpec);
+    if (timer_gettime(timerId, &currentSpec) == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to get timer information: %s", strerror(errno));
+        exit(errno);
+    }
     return currentSpec.it_value.tv_sec != 0 || currentSpec.it_value.tv_nsec != 0;
 }
 
@@ -126,14 +134,22 @@ bool LinuxTimer::setPeriodFromISR(uint32_t newPeriod_ms)
 [[nodiscard]] uint32_t LinuxTimer::getTimeout() const
 {
     itimerspec currentSpec{};
-    timer_gettime(timerId, &currentSpec);
+    if (timer_gettime(timerId, &currentSpec) == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to get timer information: %s", strerror(errno));
+        exit(errno);
+    }
     return currentSpec.it_value.tv_sec * 1000 + currentSpec.it_value.tv_nsec / 1000000;
 }
 
 [[nodiscard]] uint32_t LinuxTimer::getTimeoutTime() const
 {
     itimerspec currentSpec{};
-    timer_gettime(timerId, &currentSpec);
+    if (timer_gettime(timerId, &currentSpec) == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to get timer information: %s", strerror(errno));
+        exit(errno);
+    }
     timespec now{};
     clock_gettime(CLOCKID, &now);
     return (currentSpec.it_value.tv_sec + now.tv_sec) * 1000 + (currentSpec.it_value.tv_nsec + now.tv_nsec) / 1000000;
