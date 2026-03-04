@@ -73,7 +73,7 @@ void runProcessTest(void* arg)
 TEST(LinuxOSInterface, runProcessTest)
 {
     volatile bool processRun = false;
-    void* arg = (void*) (&processRun);
+    void*         arg        = (void*)(&processRun);
 
     auto millis = linuxOSInterface.osMillis();
     linuxOSInterface.osRunProcess(runProcessTest, arg);

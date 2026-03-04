@@ -2,8 +2,6 @@
 #include "LinuxOSInterface.h"
 #include "OSInterface_Timer.h"
 #include "gtest/gtest.h"
-#include <cstdint>
-#include <cmath>
 
 static LinuxOSInterface linuxOSInterface;
 
@@ -148,6 +146,7 @@ TEST(LinuxTimer, getTimeout)
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(20);
     uint32_t timeout = timer->getTimeout();
+    ASSERT_NEAR(timeout, 80, 10);
     linuxOSInterface.osSleep(timeout - 10);
     ASSERT_EQ(0, called);
     linuxOSInterface.osSleep(20);
@@ -166,7 +165,7 @@ TEST(LinuxTimer, getTimeoutTime)
     linuxOSInterface.osSleep(20);
     uint32_t timeoutTime = timer->getTimeoutTime();
 
-    ASSERT_LE(std::abs(static_cast<int64_t>(timeoutTime) - static_cast<int64_t>(linuxOSInterface.osMillis() + 80)), 10);
+    ASSERT_NEAR(timeoutTime, linuxOSInterface.osMillis() + 80, 10);
     while (called == 0 && linuxOSInterface.osMillis() < timeoutTime + 10)
     {
         linuxOSInterface.osSleep(10);
