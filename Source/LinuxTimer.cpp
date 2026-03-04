@@ -68,9 +68,9 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
 LinuxTimer::~LinuxTimer()
 {
     free(name);
-    if (timer_delete(timerId) == -1)
+    if (!stop() || timer_delete(timerId) == -1)
     {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy timer: %s", strerror(errno));
+        OSInterfaceLogError("LinuxOSInterface", "Failed to disarm or destroy timer: %s", strerror(errno));
         exit(errno);
     }
 }
