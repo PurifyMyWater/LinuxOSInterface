@@ -3,6 +3,8 @@
 #include "LinuxMutex.h"
 #include "LinuxTimer.h"
 
+#include "Config.h"
+
 #include <thread>
 
 #define CONFIG_USE_BUSY_SLEEP 0
@@ -10,7 +12,7 @@
 uint32_t LinuxOSInterface::osMillis()
 {
     timespec ts{};
-    clock_gettime(CLOCK_REALTIME, &ts);
+    clock_gettime(CLOCKID, &ts);
     return ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
 }
 

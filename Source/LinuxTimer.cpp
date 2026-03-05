@@ -1,12 +1,13 @@
 #include "LinuxTimer.h"
 #include "OSInterface_Log.h"
 
+#include "Config.h"
+
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <mutex>
 
-#define CLOCKID CLOCK_REALTIME
 #define TIMER_SIG SIGRTMIN
 
 void LinuxTimer::initializeSignalSystem()
