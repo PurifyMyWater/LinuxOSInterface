@@ -24,6 +24,11 @@ void LinuxTimer::initializeSignalSystem()
 
 void LinuxTimer::signalHandler(int sig, siginfo_t* si, void* uc)
 {
+    if (si == nullptr || si->si_signo != TIMER_SIG)
+    {
+        return; // A missdelivered signal has been received, ignore it
+    }
+
     if (LinuxTimer* timer = static_cast<LinuxTimer*>(si->si_value.sival_ptr);
         timer != nullptr && timer->callbackFunction != nullptr)
     {
