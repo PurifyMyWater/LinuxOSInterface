@@ -47,9 +47,9 @@ TEST(LinuxOSInterface, queueSendToFront)
     int msg1 = 1;
     int msg2 = 2;
     int msg3 = 3;
-    EXPECT_TRUE(queue->sendToFront(&msg1, 100));  // Priority 1
-    EXPECT_TRUE(queue->sendToFront(&msg2, 100));  // Priority 2
-    EXPECT_TRUE(queue->sendToFront(&msg3, 100));  // Priority 3
+    EXPECT_TRUE(queue->sendToFront(&msg1, 100)); // Priority 1
+    EXPECT_TRUE(queue->sendToFront(&msg2, 100)); // Priority 2
+    EXPECT_TRUE(queue->sendToFront(&msg3, 100)); // Priority 3
     EXPECT_EQ(queue->length(), 3);
 
     // Higher priority messages come first (3, 2, 1)
@@ -85,12 +85,12 @@ TEST(LinuxOSInterface, queueMixedSendOperations)
     int msg2 = 2;
     int msg3 = 3;
     int msg4 = 4;
-    
-    EXPECT_TRUE(queue->sendToBack(&msg1, 100));   // Priority 0: [1]
-    EXPECT_TRUE(queue->sendToBack(&msg2, 100));   // Priority 0: [1, 2]
-    EXPECT_TRUE(queue->sendToFront(&msg3, 100));  // Priority 1
-    EXPECT_TRUE(queue->sendToFront(&msg4, 100));  // Priority 2
-    
+
+    EXPECT_TRUE(queue->sendToBack(&msg1, 100));  // Priority 0: [1]
+    EXPECT_TRUE(queue->sendToBack(&msg2, 100));  // Priority 0: [1, 2]
+    EXPECT_TRUE(queue->sendToFront(&msg3, 100)); // Priority 1
+    EXPECT_TRUE(queue->sendToFront(&msg4, 100)); // Priority 2
+
     EXPECT_EQ(queue->length(), 4);
 
     // Highest priority first: msg4 (prio 2), msg3 (prio 1)

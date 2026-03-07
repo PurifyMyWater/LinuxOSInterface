@@ -3,13 +3,13 @@
 #include "Utils.h"
 
 #include <cerrno>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cstdint>
-#include <unistd.h>
 #include <fcntl.h>
 #include <random>
+#include <unistd.h>
 
 LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t messageSize, bool& result) :
     maxMessages(maxMessages), messageSize(messageSize), currentPriority(1)
@@ -17,8 +17,9 @@ LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t 
     this->currentPriority = 1;
     // Create a unique queue name using process ID and timestamp
     std::mt19937 rng(getpid() + osMillis());
-    const int randomValue = std::uniform_int_distribution<>(0, INT16_MAX)(rng);
-    snprintf(this->queueName, sizeof(this->queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), randomValue);
+    const int    randomValue = std::uniform_int_distribution<>(0, INT16_MAX)(rng);
+    snprintf(this->queueName, sizeof(this->queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(),
+             randomValue);
     result = createQueue();
 }
 
