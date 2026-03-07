@@ -12,12 +12,13 @@
 #include <random>
 
 LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t messageSize, bool& result) :
-    maxMessages(maxMessages), messageSize(messageSize)
+    maxMessages(maxMessages), messageSize(messageSize), currentPriority(1)
 {
+    this->currentPriority = 1;
     // Create a unique queue name using process ID and timestamp
     std::mt19937 rng(getpid() + osMillis());
     const int randomValue = std::uniform_int_distribution<>(0, INT16_MAX)(rng);
-    snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), randomValue);
+    snprintf(this->queueName, sizeof(this->queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), randomValue);
     result = createQueue();
 }
 
@@ -60,7 +61,7 @@ bool LinuxUntypedQueue::isFull()
 
 void LinuxUntypedQueue::reset()
 {
-
+    currentPriority = 1;
     if (createQueue() != true)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to reset queue");
@@ -148,9 +149,9 @@ bool LinuxUntypedQueue::sendToBackFromISR(const void* message)
 
 bool LinuxUntypedQueue::sendToFront(const void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec     ts      = msToTimespec(maxTimeToWait_ms);
-    constexpr uint32_t maxPrio = 31;
-    const int          result  = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, maxPrio, &ts);
+    const timespec ts     = msToTimespec(maxTimeToWait_ms);
+    const uint32_t prio   = currentPriority++;
+    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, prio, &ts);
 
     if (result == -1)
     {
@@ -162,9 +163,9 @@ bool LinuxUntypedQueue::sendToFront(const void* message, const uint32_t maxTimeT
 
 bool LinuxUntypedQueue::sendToFrontFromISR(const void* message)
 {
-    const timespec     ts      = msToTimespec(0);
-    constexpr uint32_t maxPrio = 31;
-    const int          result  = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, maxPrio, &ts);
+    const timespec ts     = msToTimespec(0);
+    const uint32_t prio   = currentPriority++;
+    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, prio, &ts);
 
     if (result == -1)
     {

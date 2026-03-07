@@ -41,6 +41,7 @@ private:
     char     queueName[256]{};
     uint32_t maxMessages;
     uint32_t messageSize;
+    uint32_t currentPriority;
 
     bool            createQueue();
     void            deleteQueue();
