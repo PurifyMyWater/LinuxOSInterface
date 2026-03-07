@@ -6,13 +6,18 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cstdint>
 #include <unistd.h>
+#include <fcntl.h>
+#include <random>
 
 LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t messageSize, bool& result) :
     maxMessages(maxMessages), messageSize(messageSize)
 {
     // Create a unique queue name using process ID and timestamp
-    snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), rand());
+    std::mt19937 rng(getpid() + osMillis());
+    const int randomValue = std::uniform_int_distribution<>(0, INT16_MAX)(rng);
+    snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), randomValue);
     result = createQueue();
 }
 
