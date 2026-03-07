@@ -63,6 +63,7 @@ bool LinuxUntypedQueue::isFull()
 void LinuxUntypedQueue::reset()
 {
     currentPriority = 1;
+    deleteQueue();
     if (createQueue() != true)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to reset queue");
