@@ -210,5 +210,14 @@ TEST(LinuxOSInterface, queueReset)
     EXPECT_EQ(queue->length(), 0);
     EXPECT_TRUE(queue->isEmpty());
 
+    // Verify the queue still functions correctly after reset.
+    int newMessage = 99;
+    EXPECT_TRUE(queue->sendToBack(&newMessage, 100));
+    EXPECT_EQ(queue->length(), 1);
+
+    int received = 0;
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, newMessage);
+    EXPECT_TRUE(queue->isEmpty());
     delete queue;
 }
