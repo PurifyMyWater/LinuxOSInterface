@@ -4,6 +4,7 @@
 #include "OSInterface_UntypedQueue.h"
 
 #include <mqueue.h>
+#include <atomic>
 
 class LinuxUntypedQueue final : public OSInterface_UntypedQueue
 {
@@ -37,11 +38,11 @@ public:
     bool sendToFrontFromISR(const void* message) override;
 
 private:
-    mqd_t    mqd{};
-    char     queueName[256]{};
-    uint32_t maxMessages;
-    uint32_t messageSize;
-    uint32_t currentPriority;
+    mqd_t                  mqd{};
+    char                   queueName[256]{};
+    uint32_t               maxMessages;
+    uint32_t               messageSize;
+    std::atomic<uint32_t>  currentPriority;
 
     bool            createQueue();
     void            deleteQueue();
