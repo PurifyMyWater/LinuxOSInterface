@@ -12,7 +12,7 @@ LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t 
     maxMessages(maxMessages), messageSize(messageSize)
 {
     // Create a unique queue name using process ID and timestamp
-    snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d", getpid(), osMillis());
+    snprintf(queueName, sizeof(queueName), "/osinterface_queue_%d_%d_%d", getpid(), osMillis(), rand());
     result = createQueue();
 }
 
