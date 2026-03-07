@@ -50,7 +50,7 @@ OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_
 
 OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
 {
-    bool result;
+    bool               result;
     LinuxUntypedQueue* queue = new LinuxUntypedQueue(maxMessages, messageSize, result);
     if (!result)
     {
