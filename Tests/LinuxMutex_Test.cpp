@@ -83,4 +83,3 @@ TEST(LinuxMutex, timeoutTest)
     EXPECT_FALSE(secondThreadLocked);
     delete mutex;
 }
-

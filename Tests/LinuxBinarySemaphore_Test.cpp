@@ -104,4 +104,3 @@ TEST(LinuxBinarySemaphore, timeoutTest)
     EXPECT_FALSE(secondThreadLocked);
     delete semaphore;
 }
-

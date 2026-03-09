@@ -1,9 +1,10 @@
 #include "Utils.h"
+#include "Config.h"
 
 timespec msToTimespec(uint32_t ms)
 {
     timespec ts{};
-    clock_gettime(CLOCK_REALTIME, &ts);
+    clock_gettime(CLOCKID, &ts);
     ts.tv_sec += ms / 1000;
     ts.tv_nsec += (ms % 1000) * 1000000;
 
