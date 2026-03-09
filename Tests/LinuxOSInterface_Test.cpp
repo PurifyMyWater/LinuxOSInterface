@@ -1,4 +1,5 @@
 #include "LinuxOSInterface.h"
+#include "OSInterface_Timer.h"
 #include "gtest/gtest.h"
 
 static LinuxOSInterface linuxOSInterface;
@@ -72,7 +73,7 @@ void runProcessTest(void* arg)
 TEST(LinuxOSInterface, runProcessTest)
 {
     volatile bool processRun = false;
-    void* arg = (void*) (&processRun);
+    void*         arg        = (void*)(&processRun);
 
     auto millis = linuxOSInterface.osMillis();
     linuxOSInterface.osRunProcess(runProcessTest, arg);
@@ -96,4 +97,11 @@ TEST(LinuxOSInterface, osCreateBinarySemaphoreNotNull)
     OSInterface_BinarySemaphore* semaphore = linuxOSInterface.osCreateBinarySemaphore();
     EXPECT_NE(semaphore, nullptr);
     delete semaphore;
+}
+
+TEST(LinuxOSInterface, osCreateTimerNotNull)
+{
+    OSInterface_Timer* timer = linuxOSInterface.osCreateTimer(0, OSInterface_Timer::ONE_SHOT, nullptr, nullptr, "");
+    EXPECT_NE(timer, nullptr);
+    delete timer;
 }
