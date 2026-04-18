@@ -3,7 +3,9 @@
 
 TEST(LinuxMutex, waitTest)
 {
-    OSInterface_Mutex* mutex = new LinuxMutex();
+    bool result;
+    OSInterface_Mutex* mutex = new LinuxMutex(result);
+    EXPECT_TRUE(result);
     EXPECT_TRUE(mutex != nullptr);
     EXPECT_TRUE(mutex->wait(10));
     delete mutex;
@@ -11,7 +13,9 @@ TEST(LinuxMutex, waitTest)
 
 TEST(LinuxMutex, normalTest)
 {
-    OSInterface_Mutex* mutex = new LinuxMutex();
+    bool result;
+    OSInterface_Mutex* mutex = new LinuxMutex(result);
+    EXPECT_TRUE(result);
     ASSERT_NE(mutex, nullptr);
 
     // Lock the mutex
@@ -47,7 +51,9 @@ TEST(LinuxMutex, normalTest)
 
 TEST(LinuxMutex, timeoutTest)
 {
-    OSInterface_Mutex* mutex = new LinuxMutex();
+    bool result;
+    OSInterface_Mutex* mutex = new LinuxMutex(result);
+    EXPECT_TRUE(result);
     ASSERT_NE(mutex, nullptr);
 
     // Lock the mutex
