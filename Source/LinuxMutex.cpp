@@ -6,12 +6,14 @@
 #include <cstdlib>
 #include <cstring>
 
-LinuxMutex::LinuxMutex()
+LinuxMutex::LinuxMutex(bool& result)
 {
     pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
-    pthread_mutex_init(&mutex, &attr);
+    if (result = (pthread_mutexattr_init(&attr) == 0); result)
+    {
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+        pthread_mutex_init(&mutex, &attr);
+    }
 }
 
 LinuxMutex::~LinuxMutex()

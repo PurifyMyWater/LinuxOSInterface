@@ -6,12 +6,11 @@
 #include <cstdlib>
 #include <cstring>
 
-LinuxBinarySemaphore::LinuxBinarySemaphore()
+LinuxBinarySemaphore::LinuxBinarySemaphore(bool& result)
 {
-    if (sem_init(&semaphore, 0, 0) == -1)
+    if (result = (sem_init(&semaphore, 0, 0) == 0); !result)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to initialize semaphore: %s", strerror(errno));
-        exit(errno);
     }
 }
 

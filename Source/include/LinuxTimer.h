@@ -11,7 +11,7 @@ class LinuxTimer final : public OSInterface_Timer
 {
 public:
     LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfaceProcess callback, void* callbackArg,
-               const char* timerName);
+               const char* timerName, bool& result);
 
     ~LinuxTimer() override;
 

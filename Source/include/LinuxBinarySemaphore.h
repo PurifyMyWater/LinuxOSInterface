@@ -8,7 +8,7 @@
 class LinuxBinarySemaphore final : public OSInterface_BinarySemaphore
 {
 public:
-    LinuxBinarySemaphore();
+    LinuxBinarySemaphore(bool& result);
 
     ~LinuxBinarySemaphore() override;
 

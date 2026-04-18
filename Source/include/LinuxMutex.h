@@ -8,7 +8,7 @@
 class LinuxMutex final : public OSInterface_Mutex
 {
 public:
-    LinuxMutex();
+    LinuxMutex(bool& result);
 
     ~LinuxMutex() override;
 
