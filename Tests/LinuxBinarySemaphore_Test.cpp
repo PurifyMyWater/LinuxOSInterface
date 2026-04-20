@@ -5,7 +5,7 @@ TEST(LinuxBinarySemaphore, initTest)
 {
     bool result;
     OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     EXPECT_TRUE(semaphore != nullptr);
     EXPECT_FALSE(semaphore->wait(10));
     delete semaphore;
@@ -15,7 +15,7 @@ TEST(LinuxBinarySemaphore, waitSignalTest)
 {
     bool result;
     OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     EXPECT_TRUE(semaphore != nullptr);
     semaphore->signal();
     EXPECT_TRUE(semaphore->wait(10));
@@ -26,7 +26,7 @@ TEST(LinuxBinarySemaphore, waitSignalWaitTest)
 {
     bool result;
     OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     EXPECT_TRUE(semaphore != nullptr);
     semaphore->signal();
     EXPECT_TRUE(semaphore->wait(10));
@@ -38,7 +38,7 @@ TEST(LinuxBinarySemaphore, normalTest)
 {
     bool result;
     OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(semaphore, nullptr);
     semaphore->signal();
 
@@ -77,7 +77,7 @@ TEST(LinuxBinarySemaphore, timeoutTest)
 {
     bool result;
     OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(semaphore, nullptr);
     semaphore->signal();
 

@@ -21,7 +21,7 @@ TEST(LinuxTimer, startOneShot)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, (void*)(&counter), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(110);
@@ -38,7 +38,7 @@ TEST(LinuxTimer, startPeriodic)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::PERIODIC, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(110);
@@ -55,7 +55,7 @@ TEST(LinuxTimer, stopOneshot)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     ASSERT_TRUE(timer->stop());
@@ -71,7 +71,7 @@ TEST(LinuxTimer, stopPeriodic)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::PERIODIC, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(110);
@@ -87,7 +87,7 @@ TEST(LinuxTimer, isRunning)
     bool               result;
     OSInterface_Timer* timer = new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_FALSE(timer->isRunning());
     ASSERT_TRUE(timer->start());
@@ -106,7 +106,7 @@ TEST(LinuxTimer, setPeriod)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(110);
@@ -124,7 +124,7 @@ TEST(LinuxTimer, getPeriod)
     bool               result;
     OSInterface_Timer* timer = new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_EQ(100, timer->getPeriod());
     ASSERT_TRUE(timer->setPeriod(200));
@@ -140,14 +140,14 @@ TEST(LinuxTimer, getMode)
 
     timer = new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_EQ(OSInterface_Timer::ONE_SHOT, timer->getMode());
     delete timer;
 
     timer = new LinuxTimer(100, OSInterface_Timer::PERIODIC, timerCallback, nullptr, "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_EQ(OSInterface_Timer::PERIODIC, timer->getMode());
     delete timer;
@@ -160,7 +160,7 @@ TEST(LinuxTimer, getTimeout)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(20);
@@ -180,7 +180,7 @@ TEST(LinuxTimer, getTimeoutTime)
     OSInterface_Timer* timer =
         new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, (void*)(&called), "test_timer", result);
 
-    EXPECT_TRUE(result);
+    ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
     ASSERT_TRUE(timer->start());
     linuxOSInterface.osSleep(20);
