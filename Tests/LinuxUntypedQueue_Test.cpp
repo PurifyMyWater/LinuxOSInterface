@@ -87,9 +87,9 @@ TEST(LinuxOSInterface, queueMixedSendOperations)
     int msg4 = 4;
 
     EXPECT_TRUE(queue->sendToBack(&msg1, 100));  // Priority 0: [1]
-    EXPECT_TRUE(queue->sendToBack(&msg2, 100));  // Priority 0: [1, 2]
-    EXPECT_TRUE(queue->sendToFront(&msg3, 100)); // Priority 1
-    EXPECT_TRUE(queue->sendToFront(&msg4, 100)); // Priority 2
+    EXPECT_TRUE(queue->sendToBack(&msg2, 100));  // Priority 0: [2, 1]
+    EXPECT_TRUE(queue->sendToFront(&msg3, 100)); // Priority 1  [2, 1, 3]
+    EXPECT_TRUE(queue->sendToFront(&msg4, 100)); // Priority 2  [2, 1, 3, 4]
 
     EXPECT_EQ(queue->length(), 4);
 

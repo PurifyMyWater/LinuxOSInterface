@@ -1,4 +1,5 @@
 #include "LinuxUntypedQueue.h"
+#include "LinuxOSInterface.h"
 #include "OSInterface_Log.h"
 #include "Utils.h"
 
@@ -11,15 +12,16 @@
 #include <random>
 #include <unistd.h>
 
+static LinuxOSInterface linuxOSInterface;
+
 LinuxUntypedQueue::LinuxUntypedQueue(const uint32_t maxMessages, const uint32_t messageSize, bool& result) :
-    maxMessages(maxMessages), messageSize(messageSize), currentPriority(1)
+    maxMessages(maxMessages), messageSize(messageSize)
 {
-    this->currentPriority = 1;
     // Create a unique queue name using process ID and timestamp
-    std::mt19937 rng(getpid() + osMillis());
+    std::mt19937 rng(getpid() + linuxOSInterface.osMillis());
     const int    randomValue = std::uniform_int_distribution<>(0, INT16_MAX)(rng);
-    snprintf(this->queueName, sizeof(this->queueName), "/osinterface_queue_%d_%u_%d", getpid(), osMillis(),
-             randomValue);
+    snprintf(this->queueName, sizeof(this->queueName), "/osinterface_queue_%d_%u_%d", getpid(),
+             linuxOSInterface.osMillis(), randomValue);
     result = createQueue();
 }
 
@@ -73,10 +75,11 @@ void LinuxUntypedQueue::reset()
 bool LinuxUntypedQueue::createQueue()
 {
     mq_attr attr{};
-    attr.mq_flags   = 0;
-    attr.mq_maxmsg  = maxMessages;
-    attr.mq_msgsize = messageSize;
-    attr.mq_curmsgs = 0;
+    attr.mq_flags         = 0;
+    attr.mq_maxmsg        = maxMessages;
+    attr.mq_msgsize       = messageSize;
+    attr.mq_curmsgs       = 0;
+    this->currentPriority = 1;
 
     mqd = mq_open(queueName, O_CREAT | O_RDWR | O_EXCL, 0644, &attr);
     if (mqd == -1)
@@ -97,9 +100,20 @@ void LinuxUntypedQueue::deleteQueue()
     }
 }
 
+bool LinuxUntypedQueue::doSend(const void* message, uint32_t priority, const timespec& ts)
+{
+    const int result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, priority, &ts);
+    if (result == -1)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to send to queue: %s", strerror(errno));
+        return false;
+    }
+    return true;
+}
+
 bool LinuxUntypedQueue::receive(void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts     = msToTimespec(maxTimeToWait_ms);
+    const timespec ts     = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
     const ssize_t  result = mq_timedreceive(mqd, static_cast<char*>(message), messageSize, nullptr, &ts);
 
     if (result == -1)
@@ -112,7 +126,7 @@ bool LinuxUntypedQueue::receive(void* message, const uint32_t maxTimeToWait_ms)
 
 bool LinuxUntypedQueue::receiveFromISR(void* message)
 {
-    const timespec ts     = msToTimespec(0);
+    const timespec ts     = msToTimespec(20);
     const ssize_t  result = mq_timedreceive(mqd, static_cast<char*>(message), messageSize, nullptr, &ts);
 
     if (result == -1)
@@ -125,61 +139,26 @@ bool LinuxUntypedQueue::receiveFromISR(void* message)
 
 bool LinuxUntypedQueue::sendToBack(const void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts     = msToTimespec(maxTimeToWait_ms);
-    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, 0, &ts);
-
-    if (result == -1)
-    {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to send to queue: %s", strerror(errno));
-        return false;
-    }
-    return true;
+    const timespec ts = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
+    return doSend(message, 0, ts);
 }
 
 bool LinuxUntypedQueue::sendToBackFromISR(const void* message)
 {
-    const timespec ts     = msToTimespec(0);
-    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, 0, &ts);
-
-    if (result == -1)
-    {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to send to queue (ISR): %s", strerror(errno));
-        return false;
-    }
-    return true;
+    const timespec ts = msToTimespec(20);
+    return doSend(message, 0, ts);
 }
 
 bool LinuxUntypedQueue::sendToFront(const void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts     = msToTimespec(maxTimeToWait_ms);
-    const uint32_t prio   = currentPriority++;
-    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, prio, &ts);
-
-    if (result == -1)
-    {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to send to front of queue: %s", strerror(errno));
-        return false;
-    }
-    return true;
+    const timespec ts   = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
+    const uint32_t prio = currentPriority++;
+    return doSend(message, prio, ts);
 }
 
 bool LinuxUntypedQueue::sendToFrontFromISR(const void* message)
 {
-    const timespec ts     = msToTimespec(0);
-    const uint32_t prio   = currentPriority++;
-    const int      result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, prio, &ts);
-
-    if (result == -1)
-    {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to send to front of queue (ISR): %s", strerror(errno));
-        return false;
-    }
-    return true;
-}
-
-uint32_t LinuxUntypedQueue::osMillis()
-{
-    timespec ts{};
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return timespecToMs(ts);
+    const timespec ts   = msToTimespec(20);
+    const uint32_t prio = currentPriority++;
+    return doSend(message, prio, ts);
 }

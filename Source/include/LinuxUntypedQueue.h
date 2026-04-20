@@ -39,13 +39,13 @@ public:
 
 private:
     mqd_t                 mqd{};
-    char                  queueName[256]{};
+    char                  queueName[NAME_MAX]{};
     uint32_t              maxMessages;
     uint32_t              messageSize;
     std::atomic<uint32_t> currentPriority;
 
-    bool            createQueue();
-    void            deleteQueue();
-    static uint32_t osMillis();
+    bool createQueue();
+    void deleteQueue();
+    bool doSend(const void* message, uint32_t priority, const timespec& ts);
 };
 #endif // LINUXUNTYPEDQUEUE_H
