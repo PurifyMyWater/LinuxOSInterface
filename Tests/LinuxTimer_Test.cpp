@@ -85,7 +85,8 @@ TEST(LinuxTimer, stopPeriodic)
 TEST(LinuxTimer, isRunning)
 {
     bool               result;
-    OSInterface_Timer* timer = new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
+    OSInterface_Timer* timer =
+        new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
 
     ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);
@@ -122,7 +123,8 @@ TEST(LinuxTimer, setPeriod)
 TEST(LinuxTimer, getPeriod)
 {
     bool               result;
-    OSInterface_Timer* timer = new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
+    OSInterface_Timer* timer =
+        new LinuxTimer(100, OSInterface_Timer::ONE_SHOT, timerCallback, nullptr, "test_timer", result);
 
     ASSERT_TRUE(result);
     ASSERT_NE(timer, nullptr);

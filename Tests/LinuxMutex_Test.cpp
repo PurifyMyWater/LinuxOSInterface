@@ -3,7 +3,7 @@
 
 TEST(LinuxMutex, waitTest)
 {
-    bool result;
+    bool               result;
     OSInterface_Mutex* mutex = new LinuxMutex(result);
     ASSERT_TRUE(result);
     EXPECT_TRUE(mutex != nullptr);
@@ -13,7 +13,7 @@ TEST(LinuxMutex, waitTest)
 
 TEST(LinuxMutex, normalTest)
 {
-    bool result;
+    bool               result;
     OSInterface_Mutex* mutex = new LinuxMutex(result);
     ASSERT_TRUE(result);
     ASSERT_NE(mutex, nullptr);
@@ -51,7 +51,7 @@ TEST(LinuxMutex, normalTest)
 
 TEST(LinuxMutex, timeoutTest)
 {
-    bool result;
+    bool               result;
     OSInterface_Mutex* mutex = new LinuxMutex(result);
     ASSERT_TRUE(result);
     ASSERT_NE(mutex, nullptr);
