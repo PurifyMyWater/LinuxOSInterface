@@ -100,7 +100,7 @@ void LinuxUntypedQueue::deleteQueue()
     }
 }
 
-bool LinuxUntypedQueue::doSend(const void* message, uint32_t priority, const timespec& ts)
+bool LinuxUntypedQueue::doSend(const void* message, uint32_t priority, const timespec& ts) const
 {
     const int result = mq_timedsend(mqd, static_cast<const char*>(message), messageSize, priority, &ts);
     if (result == -1)
