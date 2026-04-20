@@ -9,26 +9,29 @@
 LinuxMutex::LinuxMutex(bool& result)
 {
     pthread_mutexattr_t attr;
-    if (result = (pthread_mutexattr_init(&attr) == 0); !result)
+    error_t             res;
+    result = false;
+    if (res = pthread_mutexattr_init(&attr); res != 0)
     {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex attr: %s", strerror(errno));
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex attr: %s", strerror(res));
         return;
     }
-    if (result = (pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK) == 0); !result)
+    if (res = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK); res != 0)
     {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex: %s", strerror(errno));
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex: %s", strerror(res));
         return;
     }
     pthread_mutex_init(&mutex, &attr);
+    result = true;
 }
 
 LinuxMutex::~LinuxMutex()
 {
     pthread_mutex_trylock(&mutex);  // blocking mutex if unlocked as unlocking an unlocked mutex is undefined behavior
     signal();                       // make sure to unblock mutex before destroying it
-    if (pthread_mutex_destroy(&mutex) != 0)
+    if (const error_t res = pthread_mutex_destroy(&mutex); res != 0)
     {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy mutex: %s", strerror(errno));
+        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy mutex: %s", strerror(res));
         exit(EXIT_FAILURE);
     }
 }
