@@ -76,7 +76,7 @@ LinuxTimer::~LinuxTimer()
     {
         free(name);
     }
-    if (!stop() || timer_delete(timerId) == -1)
+    if (timerId != nullptr && (!stop() || timer_delete(timerId) == -1))
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to disarm or destroy timer: %s", strerror(errno));
         exit(errno);

@@ -9,16 +9,26 @@
 LinuxMutex::LinuxMutex(bool& result)
 {
     pthread_mutexattr_t attr;
-    if (result = (pthread_mutexattr_init(&attr) == 0); result)
+    if (result = (pthread_mutexattr_init(&attr) == 0); !result)
     {
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
-        pthread_mutex_init(&mutex, &attr);
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex attr: %s", strerror(errno));
+        return;
     }
+    if (result = (pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK) == 0); !result)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex: %s", strerror(errno));
+        return;
+    }
+    pthread_mutex_init(&mutex, &attr);
 }
 
 LinuxMutex::~LinuxMutex()
 {
-    pthread_mutex_destroy(&mutex);
+    if (pthread_mutex_unlock(&mutex) != 0 && pthread_mutex_destroy(&mutex) != 0)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy mutex: %s", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 }
 
 void LinuxMutex::signal()
