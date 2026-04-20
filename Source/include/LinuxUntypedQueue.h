@@ -46,6 +46,6 @@ private:
 
     bool createQueue();
     void deleteQueue();
-    bool doSend(const void* message, uint32_t priority, const timespec& ts);
+    bool doSend(const void* message, uint32_t priority, const timespec& ts) const;
 };
 #endif // LINUXUNTYPEDQUEUE_H

@@ -1,8 +1,8 @@
 #include "LinuxOSInterface.h"
 #include "LinuxBinarySemaphore.h"
 #include "LinuxMutex.h"
-#include "LinuxUntypedQueue.h"
 #include "LinuxTimer.h"
+#include "LinuxUntypedQueue.h"
 
 #include "Config.h"
 
