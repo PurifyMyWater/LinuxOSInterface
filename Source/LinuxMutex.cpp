@@ -27,13 +27,7 @@ LinuxMutex::LinuxMutex(bool& result)
 
 LinuxMutex::~LinuxMutex()
 {
-    pthread_mutex_trylock(&mutex); // blocking mutex if unlocked as unlocking an unlocked mutex is undefined behavior
-    signal();                      // make sure to unblock mutex before destroying it
-    if (const error_t res = pthread_mutex_destroy(&mutex); res != 0)
-    {
-        OSInterfaceLogError("LinuxOSInterface", "Failed to destroy mutex: %s", strerror(res));
-        exit(EXIT_FAILURE);
-    }
+    pthread_mutex_destroy(&mutex);
 }
 
 void LinuxMutex::signal()
