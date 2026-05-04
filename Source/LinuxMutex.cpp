@@ -22,6 +22,7 @@ LinuxMutex::LinuxMutex(bool& result)
         return;
     }
     pthread_mutex_init(&mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
     result = true;
 }
 
