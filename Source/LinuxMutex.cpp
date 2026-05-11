@@ -6,12 +6,24 @@
 #include <cstdlib>
 #include <cstring>
 
-LinuxMutex::LinuxMutex()
+LinuxMutex::LinuxMutex(bool& result)
 {
     pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+    error_t             res;
+    result = false;
+    if (res = pthread_mutexattr_init(&attr); res != 0)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex attr: %s", strerror(res));
+        return;
+    }
+    if (res = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK); res != 0)
+    {
+        OSInterfaceLogError("LinuxOSInterface", "Failed to initialize mutex: %s", strerror(res));
+        return;
+    }
     pthread_mutex_init(&mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
+    result = true;
 }
 
 LinuxMutex::~LinuxMutex()

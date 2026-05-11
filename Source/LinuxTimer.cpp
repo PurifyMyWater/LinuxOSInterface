@@ -38,7 +38,7 @@ void LinuxTimer::signalHandler(int sig, siginfo_t* si, void* uc)
 }
 
 LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfaceProcess callback, void* callbackArg,
-                       const char* timerName)
+                       const char* timerName, bool& result)
 {
     static std::once_flag sigSetupFlag;
     std::call_once(sigSetupFlag, [this]() { initializeSignalSystem(); });
@@ -63,11 +63,10 @@ LinuxTimer::LinuxTimer(uint32_t period, OSInterface_Timer::Mode mode, OSInterfac
     this->sev.sigev_signo           = TIMER_SIG;
     this->sev.sigev_value.sival_ptr = this;
 
-    if (timer_create(CLOCKID, &this->sev, &this->timerId) == -1)
+    if (result = (timer_create(CLOCKID, &this->sev, &this->timerId) == 0); !result)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to create timer '%s': %s", timerName ? timerName : "unknown",
                             strerror(errno));
-        exit(errno);
     }
 }
 
@@ -77,7 +76,7 @@ LinuxTimer::~LinuxTimer()
     {
         free(name);
     }
-    if (!stop() || timer_delete(timerId) == -1)
+    if (timerId != nullptr && timer_delete(timerId) == -1)
     {
         OSInterfaceLogError("LinuxOSInterface", "Failed to disarm or destroy timer: %s", strerror(errno));
         exit(errno);

@@ -36,19 +36,40 @@ void LinuxOSInterface::osSleep(const uint32_t ms)
 
 OSInterface_Mutex* LinuxOSInterface::osCreateMutex()
 {
-    return new LinuxMutex();
+    bool               result;
+    OSInterface_Mutex* mutex = new LinuxMutex(result);
+    if (!result)
+    {
+        delete mutex;
+        return nullptr;
+    }
+    return mutex;
 }
 
 OSInterface_BinarySemaphore* LinuxOSInterface::osCreateBinarySemaphore()
 {
-    return new LinuxBinarySemaphore();
+    bool                         result;
+    OSInterface_BinarySemaphore* semaphore = new LinuxBinarySemaphore(result);
+    if (!result)
+    {
+        delete semaphore;
+        return nullptr;
+    }
+    return semaphore;
 }
 
 OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_Timer::Mode mode,
                                                    OSInterfaceProcess callback, void* callbackArg,
                                                    const char* timerName)
 {
-    return new LinuxTimer(period, mode, callback, callbackArg, timerName);
+    bool               result;
+    OSInterface_Timer* timer = new LinuxTimer(period, mode, callback, callbackArg, timerName, result);
+    if (!result)
+    {
+        delete timer;
+        return nullptr;
+    }
+    return timer;
 }
 
 OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
