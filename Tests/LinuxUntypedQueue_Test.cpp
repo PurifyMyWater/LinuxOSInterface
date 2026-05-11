@@ -221,3 +221,178 @@ TEST(LinuxOSInterface, queueReset)
     EXPECT_TRUE(queue->isEmpty());
     delete queue;
 }
+
+TEST(LinuxOSInterface, queueSendToBackFromISRMultipleElements)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    // Test with multiple elements
+    int msg1 = 10;
+    int msg2 = 20;
+    int msg3 = 30;
+
+    EXPECT_TRUE(queue->sendToBackFromISR(&msg1));
+    EXPECT_EQ(queue->length(), 1);
+
+    EXPECT_TRUE(queue->sendToBackFromISR(&msg2));
+    EXPECT_EQ(queue->length(), 2);
+
+    EXPECT_TRUE(queue->sendToBackFromISR(&msg3));
+    EXPECT_EQ(queue->length(), 3);
+
+    // Verify messages are in FIFO order
+    int received = 0;
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 10);
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 20);
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 30);
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueSendToFrontFromISRMultipleElements)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    // Test with multiple elements
+    int msg1 = 11;
+    int msg2 = 22;
+    int msg3 = 33;
+
+    EXPECT_TRUE(queue->sendToFrontFromISR(&msg1));
+    EXPECT_EQ(queue->length(), 1);
+
+    EXPECT_TRUE(queue->sendToFrontFromISR(&msg2));
+    EXPECT_EQ(queue->length(), 2);
+
+    EXPECT_TRUE(queue->sendToFrontFromISR(&msg3));
+    EXPECT_EQ(queue->length(), 3);
+
+    // Verify messages are in priority order (highest priority first)
+    // msg3 has highest priority (sent last to front), msg2 next, msg1 lowest
+    int received = 0;
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 33);
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 22);
+    EXPECT_TRUE(queue->receive(&received, 100));
+    EXPECT_EQ(received, 11);
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueSendToBackWhenFull)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(3, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    int msg1 = 1;
+    int msg2 = 2;
+    int msg3 = 3;
+    int msg4 = 4;
+
+    // Fill the queue
+    EXPECT_TRUE(queue->sendToBack(&msg1, 100));
+    EXPECT_TRUE(queue->sendToBack(&msg2, 100));
+    EXPECT_TRUE(queue->sendToBack(&msg3, 100));
+    EXPECT_TRUE(queue->isFull());
+
+    // Try to send to a full queue (should timeout and fail)
+    EXPECT_FALSE(queue->sendToBack(&msg4, 1));
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueSendToFrontWhenFull)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(3, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    int msg1 = 1;
+    int msg2 = 2;
+    int msg3 = 3;
+    int msg4 = 4;
+
+    // Fill the queue
+    EXPECT_TRUE(queue->sendToBack(&msg1, 100));
+    EXPECT_TRUE(queue->sendToBack(&msg2, 100));
+    EXPECT_TRUE(queue->sendToBack(&msg3, 100));
+    EXPECT_TRUE(queue->isFull());
+
+    // Try to send to a full queue (should timeout and fail)
+    EXPECT_FALSE(queue->sendToFront(&msg4, 1));
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueSendToBackFromISRWhenFull)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(2, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    int msg1 = 1;
+    int msg2 = 2;
+    int msg3 = 3;
+
+    // Fill the queue
+    EXPECT_TRUE(queue->sendToBackFromISR(&msg1));
+    EXPECT_TRUE(queue->sendToBackFromISR(&msg2));
+    EXPECT_TRUE(queue->isFull());
+
+    // Try to send to a full queue from ISR (should fail immediately)
+    EXPECT_FALSE(queue->sendToBackFromISR(&msg3));
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueSendToFrontFromISRWhenFull)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(2, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    int msg1 = 1;
+    int msg2 = 2;
+    int msg3 = 3;
+
+    // Fill the queue
+    EXPECT_TRUE(queue->sendToFrontFromISR(&msg1));
+    EXPECT_TRUE(queue->sendToFrontFromISR(&msg2));
+    EXPECT_TRUE(queue->isFull());
+
+    // Try to send to a full queue from ISR (should fail immediately)
+    EXPECT_FALSE(queue->sendToFrontFromISR(&msg3));
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueReceiveFromEmpty)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    EXPECT_TRUE(queue->isEmpty());
+
+    int received = 0;
+    // Try to receive from an empty queue (should timeout and fail)
+    EXPECT_FALSE(queue->receive(&received, 1));
+
+    delete queue;
+}
+
+TEST(LinuxOSInterface, queueReceiveFromISRFromEmpty)
+{
+    OSInterface_UntypedQueue* queue = linuxOSInterface.osCreateUntypedQueue(10, sizeof(int));
+    ASSERT_NE(queue, nullptr);
+
+    EXPECT_TRUE(queue->isEmpty());
+
+    int received = 0;
+    // Try to receive from an empty queue using ISR (should fail immediately)
+    EXPECT_FALSE(queue->receiveFromISR(&received));
+
+    delete queue;
+}

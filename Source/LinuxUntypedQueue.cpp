@@ -113,7 +113,7 @@ bool LinuxUntypedQueue::doSend(const void* message, uint32_t priority, const tim
 
 bool LinuxUntypedQueue::receive(void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts     = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
+    const timespec ts     = msToTimespec(maxTimeToWait_ms);
     const ssize_t  result = mq_timedreceive(mqd, static_cast<char*>(message), messageSize, nullptr, &ts);
 
     if (result == -1)
@@ -139,7 +139,7 @@ bool LinuxUntypedQueue::receiveFromISR(void* message)
 
 bool LinuxUntypedQueue::sendToBack(const void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
+    const timespec ts = msToTimespec(maxTimeToWait_ms);
     return doSend(message, 0, ts);
 }
 
@@ -151,7 +151,7 @@ bool LinuxUntypedQueue::sendToBackFromISR(const void* message)
 
 bool LinuxUntypedQueue::sendToFront(const void* message, const uint32_t maxTimeToWait_ms)
 {
-    const timespec ts   = msToTimespec(linuxOSInterface.osMillis() + maxTimeToWait_ms);
+    const timespec ts   = msToTimespec(maxTimeToWait_ms);
     const uint32_t prio = currentPriority++;
     return doSend(message, prio, ts);
 }
