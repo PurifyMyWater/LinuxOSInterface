@@ -2,6 +2,7 @@
 #include "LinuxBinarySemaphore.h"
 #include "LinuxMutex.h"
 #include "LinuxTimer.h"
+#include "LinuxUntypedQueue.h"
 
 #include "Config.h"
 
@@ -73,7 +74,15 @@ OSInterface_Timer* LinuxOSInterface::osCreateTimer(uint32_t period, OSInterface_
 
 OSInterface_UntypedQueue* LinuxOSInterface::osCreateUntypedQueue(uint32_t maxMessages, uint32_t messageSize)
 {
-    return nullptr;
+    bool               result;
+    LinuxUntypedQueue* queue = new LinuxUntypedQueue(maxMessages, messageSize, result);
+    if (!result)
+    {
+        OSInterfaceLogError("OSInterface", "Failed to create untyped queue");
+        delete queue;
+        return nullptr;
+    }
+    return queue;
 }
 
 void* LinuxOSInterface::osMalloc(const uint32_t size)

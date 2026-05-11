@@ -16,3 +16,8 @@ timespec msToTimespec(uint32_t ms)
     }
     return ts;
 }
+
+uint32_t timespecToMs(const timespec& ts)
+{
+    return ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
+}
